@@ -1,23 +1,52 @@
-<script setup lang="ts"></script>
-
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+ 
+interface PokemonType {
+  name: string;
+  image: string;
+}
+ 
+interface Pokemon {
+  pokedex_id: number;
+  name: {
+    fr: string;
+  };
+  types: PokemonType[];
+}
+ 
+const pokemons = ref<Pokemon[]>([])
+ 
+onMounted(async () => {
+  try {
+    const response = await fetch('https://tyradex.vercel.app/api/v1/gen/1')
+    const data: Pokemon[] = await response.json()
+    pokemons.value = data
+  } catch (error) {
+    console.error("Erreur lors du chargement de la génération :", error)
+  }
+})
+</script>
+ 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-    <h1 class="text-4xl font-bold text-blue-600 mb-4">🎉 Tailwind est bien là !</h1>
-    <p class="text-gray-700 text-lg">
-      Si ce texte est bien <span class="text-green-600 font-semibold">vert</span> et qu’il y a un fond gris clair,<br />
-      alors Tailwind CSS fonctionne correctement ✅
-    </p>
-
-    <button
-      class="mt-6 px-6 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:scale-105 transition-transform"
-    >
-      Bouton test Tailwind
-    </button>
-
-    <p class="mt-10 text-sm text-gray-500">
-      Consulte <a href="https://tailwindcss.com/docs" class="text-blue-500 underline" target="_blank">la doc Tailwind</a>
-    </p>
+  <h1>Pokédex - Génération 1</h1>
+ 
+  <div v-if="pokemons.length === 0">
+    <p>Chargement des Pokémon...</p>
+  </div>
+ 
+  <div v-else class="">
+    <div v-for="pokemon in pokemons" :key="pokemon.pokedex_id" class="border flex flex-row">
+      
+      <span class="pl-4 px-2">#{{ pokemon.pokedex_id }}</span>
+ 
+      <h2 class="px-3">{{ pokemon.name.fr }}</h2>
+      <div class="">
+        <span v-for="type in pokemon.types" :key="type.name" class="px-1">
+          {{ type.name }}
+        </span>
+      </div>
+    </div>
   </div>
 </template>
-
-<style scoped></style>
+ 
+ 
